@@ -1,58 +1,38 @@
 module.exports = function check(str, bracketsConfig) {
-    var stack = [];
+
     var opensym = [];
     var closesym = [];
-    var stacklen = 0;
-    for (i in bracketsConfig) {
-      opensym.push(bracketsConfig[i][0]);
-      closesym.push(bracketsConfig[i][1]);
-    };
-  
-    for (l in str) {
-      stacklen = stack.length;
-      if (opensym.includes(str[l]) && closesym.includes(str[l])) {
-          
-        if (stack.length > 0) {
-          if (stack[stacklen-1] == str[l]) {
-            stack.pop(stacklen-1); }
-          else { 
-            stack.push(str[l])
-          };
-        }
-    
-      else {
-        stack.push(str[l]) };
-    }  
 
-        else {
+    const openclose = (a,b) => {
+        return b === opensym[closesym.indexOf(a)]
+    }
 
-        if (opensym.includes(str[l])) {
-          stack.push(str[l]);
-          
-        };
-        if (closesym.includes(str[l])) {
-          if (stack.length <1) { return false}
-          var ind = closesym.indexOf(str[l]);
-          var opens = opensym[ind];
-          if (stacklen > 0) {
-            if (stack[stacklen-1] == opens) {
-              stack.pop(stacklen-1);
+    const close = (a) => closesym.includes(a)
+
+    bracketsConfig.forEach(el => {
+        opensym.push(el[0]);
+        closesym.push(el[1])
+    });
+
+    return str.split('').reduce((a,b) => {
+        if (!a[0]) {
+            a.push(b)
+            return a
+            };
+
+        const len = a.length;
+
+        if (close(b)) {
+            if (openclose(b, a[len-1])) {
+                a.pop()
             }
             else {
-              return false;
-            };
-  
-          };
-        };
-      };  
-      
-     };
-    
-    console.log(stack);
-  if (stack.length == 0) {
-    return true
-  }
-  else {
-    return false
-  };
-};
+                a.push(b)
+            }
+        }
+        else {
+            a.push(b)
+        }
+        return a
+    }, []).length === 0
+}
